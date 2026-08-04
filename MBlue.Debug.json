@@ -1,24 +1,8 @@
 {
-    "MBLogger": {
-        "LogLevel": "Debug",
-        "DINIT": true,
-        "DINITDETAIL": true,
-        "DREST": true,
-        "DRESTDETAIL": false,
-        "DWORKQUEUE": true,
-        "DWORKQUEUEDETAIL": false,
-        "DUIDETAIL": true,
-        "DCOMM": true,
-        "DCOMMDETAIL": true,
-        "DWORLD": true,
-        "DWORLDDETAIL": true,
-        "DUPDATE": true,
-        "DUPDATEDETAIL": true,
-        "DTEXTURE": true,
-        "DTEXTUREDETAIL": true,
-        "DRENDER": true,
-        "DRENDERDETAIL": true,
-        "DVIEW": true,
-        "DVIEWDETAIL": true
-    }
+  "MBLogger": {
+    "LogLevel": "Debug",
+    // To select detailed log levels, set "LogLevel" to "" and set "LogSelections" to
+    // a comma-separated list of log levels, e.g. "Critical,Error,Warning,Information,DBADERROR"
+    "LogSelections": "Critical,Error,Warning,Information,DBADERROR"
+  }
 }

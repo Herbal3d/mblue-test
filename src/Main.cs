@@ -9,6 +9,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Reflection;
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -114,6 +116,8 @@ namespace org.herbal3d.mblue
                      services.Configure<MBLoggerConfig>(context.Configuration.GetSection(MBLoggerConfig.subSectionName));
                      services.AddTransient(typeof(MBLogger<>));
 
+                     MBlue_ECM.AddMBlueECMServices(services, context.Configuration);
+
                      // TODO: add more
 
                  })
@@ -124,6 +128,12 @@ namespace org.herbal3d.mblue
             IOptions<MBlueConfig> mblueConfig = GetMBlueConfig;
 
             m_log.LogInformation("MBlue Version: {version}", ThisAssembly.AssemblyInformationalVersion);
+
+            // Get the version of MBlue.Common from its assembly attribute
+            string mblue_common_version = typeof(MBException).Assembly
+                .GetCustomAttribute<System.Reflection.AssemblyInformationalVersionAttribute>()
+                ?.InformationalVersion ?? "unknown";
+            m_log.LogInformation("MBlue.Common Version: {version}", mblue_common_version);
 
             LogConfigurationComplete(m_log);
 

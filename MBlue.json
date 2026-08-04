@@ -1,11 +1,7 @@
 {
   "MBlueTest": {},
   "MBLogging": {
-    // LogLevelFlags: 1=Trace, 2=Debug, 4=Information, 8=Warning, 16=Error, 32=Critical, 64=DBADERROR
-    "LogLevel": "Critical,Error,Warning,Information,DBADERROR",
-    "LogLevelFlags": 126,
-    "WithoutDebugLogLevelFlags": 124,
-    "DebugLogLevelFlags": 126,
+    "LogLevel": "Warning",
     "NLog": {
       "IncludeScopes": true,
       "RemoveLoggerFactoryFilter": true
