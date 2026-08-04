@@ -1,0 +1,13 @@
+{
+  "folders": [
+    {
+      "path": ".",
+    },
+  ],
+  "settings": {
+    "files.associations": {
+      "MBlue.json": "jsonc",
+      "MBlue.Debug.json": "jsonc",
+    },
+  },
+}

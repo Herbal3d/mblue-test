@@ -1,47 +1,48 @@
 {
-    "MBlueTest": {
-    },
-    "Logging": {
-        "LogLevel": {
-            "Default": "Information"
-        },
-        "NLog": {
-            "IncludeScopes": true,
-            "RemoveLoggerFactoryFilter": true
-        }
-    },
+  "MBlueTest": {},
+  "MBLogging": {
+    // LogLevelFlags: 1=Trace, 2=Debug, 4=Information, 8=Warning, 16=Error, 32=Critical, 64=DBADERROR
+    "LogLevel": "Critical,Error,Warning,Information,DBADERROR",
+    "LogLevelFlags": 126,
+    "WithoutDebugLogLevelFlags": 124,
+    "DebugLogLevelFlags": 126,
     "NLog": {
-        "autoReload": true,
-        "throwConfigExceptions": true,
-        "internalLogLevel": "Warn",
-        "internalLogFile": "logs/nlog-internal.log",
-        "variables": {
-            "var_logdir": "logs",
-            "DefaultLayout": "${longdate}|${level:uppercase=true}|${logger}|${message}${onexception:inner=${newline}${exception:format=tostring}}",
-            "DefaultMinLevel": "Info"
-        },
-        "targets": {
-            "file": {
-                "type": "File",
-                "fileName": "${var_logdir}/log-${shortdate}.log",
-                "layout": "${DefaultLayout}",
-                "archiveFileName": "${var_logdir}/archives/log-{#}.log",
-                "archiveNumbering": "Rolling",
-                "maxArchiveFiles": 7,
-                "archiveEvery": "Day",
-                "keepFileOpen": false
-            },
-            "console": {
-                "type": "Console",
-                "layout": "${longdate}|${level:uppercase=true}|${logger}|${message}${onexception:inner=${newline}${exception:format=tostring}}"
-            }
-        },
-        "rules": [
-            {
-                "logger": "*",
-                "minLevel": "${DefaultMinLevel}",
-                "writeTo": "file,console"
-            }
-        ]
+      "IncludeScopes": true,
+      "RemoveLoggerFactoryFilter": true
     }
+  },
+  "NLog": {
+    "autoReload": true,
+    "throwConfigExceptions": true,
+    "internalLogLevel": "Warn",
+    "internalLogFile": "logs/nlog-internal.log",
+    "variables": {
+      "var_logdir": "logs",
+      "DefaultLayout": "${longdate}|${level:uppercase=true}|${logger}|${message}${onexception:inner=${newline}${exception:format=tostring}}",
+      "DefaultMinLevel": "Info"
+    },
+    "targets": {
+      "file": {
+        "type": "File",
+        "fileName": "${var_logdir}/log-${shortdate}.log",
+        "layout": "${DefaultLayout}",
+        "archiveFileName": "${var_logdir}/archives/log-{#}.log",
+        "archiveNumbering": "Rolling",
+        "maxArchiveFiles": 7,
+        "archiveEvery": "Day",
+        "keepFileOpen": false
+      },
+      "console": {
+        "type": "Console",
+        "layout": "${longdate}|${level:uppercase=true}|${logger}|${message}${onexception:inner=${newline}${exception:format=tostring}}"
+      }
+    },
+    "rules": [
+      {
+        "logger": "*",
+        "minLevel": "${DefaultMinLevel}",
+        "writeTo": "file,console"
+      }
+    ]
+  }
 }
