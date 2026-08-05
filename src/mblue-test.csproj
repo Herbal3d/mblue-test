@@ -26,6 +26,13 @@
     <PackageReference Include="mblue_common" Version="*" />
   </ItemGroup>
 
+  <ItemGroup Condition="Exists('../../mblue-ecm/src/mblue_ecm.csproj')">
+    <ProjectReference Include="../../mblue-ecm/src/mblue_ecm.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="!Exists('../../mblue-common/src/mblue_ecm.csproj')">
+    <PackageReference Include="mblue_ecm" Version="*" />
+  </ItemGroup>
+
   <ItemGroup>
     <Content Include="..\*.json"
                 Exclude="..\tsconfig.json;..\package.json;..\package-lock.json" >
