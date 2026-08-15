@@ -22,9 +22,11 @@ using org.herbal3d.mblue.Config;
 using org.herbal3d.mblue.ecm;
 using org.herbal3d.mblue.Logging;
 
-namespace org.herbal3d.mblue {
+namespace org.herbal3d.mblue
+{
 
-    public partial class MBlueTestMain {
+    public partial class MBlueTestMain
+    {
 
         public static IHost? MBlueHost { get; private set; } = default!;
 
@@ -32,9 +34,12 @@ namespace org.herbal3d.mblue {
 
         // Way to get the logger for those isolated routines that need to log errors
         private static MBLogger<MBlueTestMain>? m_log;
-        public static MBLogger<MBlueTestMain> Log {
-            get {
-                if (m_log is null) {
+        public static MBLogger<MBlueTestMain> Log
+        {
+            get
+            {
+                if (m_log is null)
+                {
                     throw new ApplicationException("MBlueMain.Log accessed before initialization.");
                 }
                 return m_log;
@@ -42,8 +47,10 @@ namespace org.herbal3d.mblue {
         }
 
         // Static way to get to options
-        public static IOptions<MBlueConfig> GetMBlueConfig {
-            get {
+        public static IOptions<MBlueConfig> GetMBlueConfig
+        {
+            get
+            {
                 return GetService<IOptions<MBlueConfig>>();
             }
         }
@@ -55,7 +62,8 @@ namespace org.herbal3d.mblue {
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         /// <exception cref="ApplicationException"></exception>
-        public static T GetService<T>() where T : notnull {
+        public static T GetService<T>() where T : notnull
+        {
             return MBlueHost!.Services.GetRequiredService<T>()
                 ?? throw new ApplicationException($"There requested type {typeof(T).FullName} could not be provided.");
         }
@@ -67,10 +75,12 @@ namespace org.herbal3d.mblue {
         /// services and call the other libraries to add themselves to the
         /// services collection and then test that it all worked.
         /// </summary>
-        public static async Task Main(string[] args) {
+        public static async Task Main(string[] args)
+        {
 
             MBlueHost = Host.CreateDefaultBuilder(args)
-                 .ConfigureAppConfiguration((context, config) => {
+                 .ConfigureAppConfiguration((context, config) =>
+                 {
                      // CreateDefaultBuilder already adds 'appsettings.json',
                      //     'appsettings.Development.json', and environment variables.
 
@@ -87,7 +97,8 @@ namespace org.herbal3d.mblue {
                      // re-add command line args so they override other settings
                      config.AddCommandLine(Environment.GetCommandLineArgs());
                  })
-                 .ConfigureLogging(logging => {
+                 .ConfigureLogging(logging =>
+                 {
                      // Remove all the MS stuff and use NLog
                      logging.ClearProviders();
                      logging.AddNLog();
@@ -95,7 +106,8 @@ namespace org.herbal3d.mblue {
                      // https://github.com/NLog/NLog.Extensions.Logging/wiki/NLog-configuration-with-appsettings.json
                      // for more details on NLog configuration using appsettings.json.
                  })
-                 .ConfigureServices((context, services) => {
+                 .ConfigureServices((context, services) =>
+                 {
                      services.Configure<MBlueConfig>(context.Configuration.GetSection(MBlueConfig.subSectionName));
 
                      // The global cancellation token source that can be used to signal shutdown across the app.
@@ -105,7 +117,7 @@ namespace org.herbal3d.mblue {
                      services.Configure<MBLoggerConfig>(context.Configuration.GetSection(MBLoggerConfig.subSectionName));
                      services.AddTransient(typeof(MBLogger<>));
 
-                     MBlueECMServiceSetup.AddMBlueECMServices(services, context.Configuration);
+                     MBlueECMServiceSetup.AddServices(services, context.Configuration);
 
                      // TODO: add more
 
@@ -123,6 +135,12 @@ namespace org.herbal3d.mblue {
                 .GetCustomAttribute<System.Reflection.AssemblyInformationalVersionAttribute>()
                 ?.InformationalVersion ?? "unknown";
             m_log.LogInformation("MBlue.Common Version: {version}", mblue_common_version);
+
+            // Get the version of MBlue.ECM from its assembly attribute
+            string mblue_ecm_version = typeof(MBlueECMServiceSetup).Assembly
+                .GetCustomAttribute<System.Reflection.AssemblyInformationalVersionAttribute>()
+                ?.InformationalVersion ?? "unknown";
+            m_log.LogInformation("MBlue.ECM Version: {version}", mblue_ecm_version);
 
             LogConfigurationComplete(m_log);
 

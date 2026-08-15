@@ -9,5 +9,6 @@
       "MBlue.json": "jsonc",
       "MBlue.Debug.json": "jsonc",
     },
+    "peacock.surpriseMeOnStartup": true,
   },
 }
