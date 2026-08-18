@@ -26,11 +26,11 @@
     <PackageReference Include="mblue.common" Version="*" />
   </ItemGroup>
 
-  <ItemGroup Condition="Exists('../../mblue.ecm/src/mblue.ecm.Interface/mblue.ecm.Interface.csproj')">
-    <ProjectReference Include="../../mblue.ecm/src/mblue.ecm.Interface/mblue.ecm.Interface.csproj" />
+  <ItemGroup Condition="Exists('../../mblue.ecm/src/mblue.ecm/mblue.ecm.csproj')">
+    <ProjectReference Include="../../mblue.ecm/src/mblue.ecm/mblue.ecm.csproj" />
   </ItemGroup>
-  <ItemGroup Condition="!Exists('../../mblue.ecm/src/mblue.ecm.Interface/mblue.ecm.Interface.csproj')">
-    <PackageReference Include="mblue.ecm.Interface" Version="*" />
+  <ItemGroup Condition="!Exists('../../mblue.ecm/src/mblue.ecm/mblue.ecm.csproj')">
+    <PackageReference Include="mblue.ecm" Version="*" />
   </ItemGroup>
 
   <ItemGroup Condition="Exists('../../mblue.comm/src/mblue.comm.Interface/mblue.comm.Interface.csproj')">
