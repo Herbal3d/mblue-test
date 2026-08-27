@@ -1,0 +1,323 @@
+﻿// Copyright 2025 Robert Adams
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+using System.Net;
+using System.Text;
+using System.Text.Json.Nodes;
+
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
+
+using org.herbal3d.mblue.Common;
+using org.herbal3d.mblue.Config;
+using org.herbal3d.mblue.Statistics;
+using org.herbal3d.mblue.Logging;
+
+namespace org.herbal3d.mblue.Rest {
+
+    /// <summary>
+    /// RestManager makes available HTTP connections to static and dynamic information.
+    /// RestManager provides two functions: static web pages for ui and script support and
+    /// REST interface capabilities for services within KeeKee to get and present data.
+    /// 
+    /// The static interface presents two sets of URLs which are mapped into the filesystem:
+    /// http://127.0.0.1:9144/std/xxx : 'standard' pages which are common libraries
+    /// This maps to the directory "Rest.Manager.UIContentDir" which defaults to
+    /// "BINDIR/../UI/std/"
+    /// http://127.0.0.1:9144/static/xxx : ui pages which can be 'skinned'
+    /// This maps to the directory "Rest.Manager.UIContentDir"/"Rest.Manaager.Skin" which
+    /// defaults to "BINDIR/../UI/Default/".
+    /// 
+    /// The dynamic content is created by servers creating instances of RestHandler.
+    /// This creates URLs like:
+    /// http://127.0.0.1:9144/api/SERVICE/xxx
+    /// where 'service' is the name of teh service and 'xxx' is whatever it wants.
+    /// These implement GET and POST operations of JSON formatted data.
+    /// </summary>
+    public class RestManager : BackgroundService, IDumpable {
+
+        private readonly MBLogger<RestManager> m_log;
+        private readonly IOptions<RestManagerConfig> m_restConfig;
+        private readonly IOptions<MBlueConfig> m_MBlueConfig;
+
+        public const string MIMEDEFAULT = "text/html";
+
+        public int Port { get; private set; }
+        private HttpListener? m_listener;
+        List<RestHandler> m_handlers = new List<RestHandler>();
+
+        private readonly RestHandlerFactory m_RestHandlerFactory;
+
+        private StatCounter m_statRequests = new StatCounter("RestManager.Requests", "Number of REST requests processed");
+        private StatCounter m_statNoHandlers = new StatCounter("RestManager.NoHandlers", "Number of REST requests with no handler");
+
+        // General reference to the base API URL prefix
+        public string APIBase {
+            get {
+                return m_restConfig.Value.APIBase;
+            }
+        }
+
+        private RestHandler? m_staticHandler;
+        private RestHandler? m_stdHandler;
+        private RestHandler? m_statsHandler;
+
+        // return the full base URL with the port added
+        public readonly string BaseURL;
+
+        public RestManager(MBLogger<RestManager> pLog,
+                        IOptions<RestManagerConfig> pConfig,
+                        IOptions<MBlueConfig> pMBlueConfig,
+                        RestHandlerFactory pRestHandlerFactory) {
+            m_log = pLog;
+            m_restConfig = pConfig;
+            m_MBlueConfig = pMBlueConfig;
+            m_RestHandlerFactory = pRestHandlerFactory;
+
+            BaseURL = pConfig.Value.BaseURL + ":" + pConfig.Value.Port.ToString();
+            Port = pConfig.Value.Port;
+
+            m_log.Log(MBLogLevel.DREST, "RestManager constructor");
+        }
+
+        protected override async Task ExecuteAsync(CancellationToken cancellationToken) {
+            m_log.Log(MBLogLevel.DREST, "RestManager ExecuteAsync entered");
+
+            if (!m_restConfig.Value.Enable) {
+                m_log.Log(MBLogLevel.DREST, "RestManager not enabled by config");
+                return;
+            }
+
+            // Create the listener
+            m_listener = new HttpListener();
+            m_listener.Prefixes.Add(BaseURL + "/");
+
+            // Default handlers for static content and stats
+            m_staticHandler = m_RestHandlerFactory.CreateHandler<RestHandlerStatic>();
+            m_stdHandler = m_RestHandlerFactory.CreateHandler<RestHandlerUI>();
+            m_statsHandler = m_RestHandlerFactory.CreateHandler<RestHandlerStats>();
+            // m_faviconHandler = m_RestHandlerFactory.CreateHandler<RestHandlerFavicon>();
+
+            try {
+                m_log.Log(MBLogLevel.DRESTDETAIL, "Start(). Starting listening");
+                m_listener.Start();
+
+                while (cancellationToken.IsCancellationRequested == false) {
+                    await m_listener.GetContextAsync().ContinueWith(async (task) => {
+                        try {
+                            m_statRequests.Event();
+
+                            HttpListenerContext context = task.Result;
+                            HttpListenerRequest request = context.Request;
+                            HttpListenerResponse response = context.Response;
+
+                            string absURL = request.Url?.AbsolutePath.ToLower() ?? "";
+                            m_log.Log(MBLogLevel.DRESTDETAIL, "HTTP request for {0}", absURL);
+
+                            RestHandler? thisHandler = m_handlers.Find((rh) => absURL.StartsWith(rh.Prefix.ToLower()));
+
+                            if (thisHandler != null && request != null && response != null) {
+                                string afterString = absURL.Substring(thisHandler.Prefix.Length);
+                                switch (request.HttpMethod.ToUpper()) {
+                                    case "GET":
+                                        await thisHandler.ProcessGetRequest(context, request, response, cancellationToken);
+                                        break;
+                                    case "POST":
+                                        await thisHandler.ProcessPostRequest(context, request, response, cancellationToken);
+                                        break;
+                                    default:
+                                        await thisHandler.ProcesstOtherRequest(context, request, response, cancellationToken);
+                                        break;
+                                }
+                            } else {
+                                m_statNoHandlers.Event();
+                                m_log.Log(MBLogLevel.Warning, "Request not processed because no matching handler, URL={0}", absURL);
+                                DoErrorResponse(response, HttpStatusCode.NotFound, null);
+                            }
+                        } catch (Exception e) {
+                            m_log.Log(MBLogLevel.Error, "RestManager listener exception: {0}", e.ToString());
+                        }
+                    }, cancellationToken);
+                }
+            } catch (OperationCanceledException) {
+                m_log.Log(MBLogLevel.DREST, "RestManager ExecuteAsync cancellation requested");
+            } catch (Exception e) {
+                m_log.Log(MBLogLevel.Error, "RestManager ExecuteAsync listener registration exception: {0}", e.ToString());
+                return;
+            }
+
+            // TODO: cleanup on exit
+            m_log.Log(MBLogLevel.DRESTDETAIL, "RestManager ExecuteAsync exiting");
+            return;
+        }
+
+        public void RegisterListener(RestHandler handler) {
+            if (m_restConfig.Value.Enable == false) {
+                m_log.Log(MBLogLevel.DRESTDETAIL, "RestManager not enabled by config, not registering handler {0}", handler.Prefix);
+                return;
+            }
+            m_log.Log(MBLogLevel.DREST, "Registering prefix {0}", handler.Prefix);
+            m_handlers.Add(handler);
+        }
+
+        #region HTML Helper Routines
+
+        public delegate byte[] ConstructResponseBody();
+
+        /// <summary>
+        /// Construct and return the HTTP response
+        /// </summary>
+        /// <param name="pResponse">The response structure</param>
+        /// <param name="pContentType">The MIME type of the response</param>
+        /// <param name="pContentBodySource">Routine to call to generate the content body</param>
+        public async void DoSimpleResponse(HttpListenerResponse? pResponse,
+                        string? pContentType,
+                        ConstructResponseBody? pContentBodySource) {
+
+            if (pResponse == null) return;
+
+            // Construct the self reference for Content-Security-Policy
+            string selfUrl = m_restConfig.Value.BaseURL + ":" + m_restConfig.Value.Port.ToString();
+
+            byte[] encodedBuff;
+
+            try {
+                pResponse.ContentType = pContentType == null ? MIMEDEFAULT : pContentType;
+                pResponse.AddHeader("Server", m_MBlueConfig.Value.AppName);
+                pResponse.AddHeader("Cache-Control", "no-cache");
+                pResponse.AddHeader("Access-Control-Allow-Origin", "*");
+                pResponse.AddHeader(
+                    "Content-Security-Policy",
+                    $"default-src 'self' 'unsafe-inline'; " +
+                    $"script-src 'self' 'unsafe-inline'; " +
+                    $"script-src-elem 'self' 'unsafe-inline'; " +
+                    $"script-src-attr 'self' 'unsafe-inline'; " +
+                    $"connect-src 'self'"
+                );
+                // context.Connection = ConnectionType.Close;
+
+                encodedBuff = pContentBodySource != null ? pContentBodySource() : new byte[0];
+
+                pResponse.StatusCode = (int)HttpStatusCode.OK;
+            } catch {
+                encodedBuff = OneNullBody();
+                pResponse.StatusCode = (int)HttpStatusCode.InternalServerError;
+            }
+
+            // byte[] encodedBuff = System.Text.Encoding.UTF8.GetBytes(buff.ToString());
+
+            pResponse.ContentLength64 = encodedBuff.Length;
+            Stream output = pResponse.OutputStream;
+            await output.WriteAsync(encodedBuff, 0, encodedBuff.Length);
+            output.Close();
+
+            return;
+        }
+
+        /// <summary>
+        /// Construct a response that is all abbout errors
+        /// </summary>
+        /// <param name="context">The request information</param>
+        /// <param name="errCode">The HTTP error code toreturn</param>
+        /// <param name="addContent">Called to add HTML to the body. May be null.</param>
+        public void DoErrorResponse(HttpListenerResponse? pResponse,
+                        HttpStatusCode errCode,
+                        ConstructResponseBody? pContentBodySource) {
+
+            if (pResponse == null) return;
+
+            byte[] encodedBuff;
+
+            try {
+                pResponse.ContentType = MIMEDEFAULT;
+                pResponse.AddHeader("Server", m_MBlueConfig.Value.AppName);
+                // context.Connection = ConnectionType.Close;
+
+                encodedBuff = pContentBodySource != null ? pContentBodySource() : new byte[0];
+
+                pResponse.StatusCode = (int)errCode;
+            } catch (Exception e) {
+                m_log.Log(MBLogLevel.Error, "DoErrorResponse exception creating error response: {0}", e.ToString());
+                encodedBuff = new byte[0];
+                pResponse.StatusCode = (int)HttpStatusCode.InternalServerError;
+            }
+
+            // Ways to turn a StringBuilder into a byte array:
+            // byte[] encodedBuff = System.Text.Encoding.UTF8.GetBytes(buff.ToString());
+            // buff.Append(OMVSD.OSDParser.SerializeJsonString(resp));
+
+            pResponse.ContentLength64 = encodedBuff.Length;
+            System.IO.Stream output = pResponse.OutputStream;
+            output.Write(encodedBuff, 0, encodedBuff.Length);
+            output.Close();
+            return;
+        }
+
+        /// <summary>
+        /// Return a simple HTML body with nothing in it.
+        /// </summary>
+        /// <returns></returns>
+        private byte[] OneNullBody() {
+            var buff = new StringBuilder();
+            buff.Append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\r\n");
+            buff.Append("<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n");
+            buff.Append("<head></head><body></body></html>\r\n");
+            return System.Text.Encoding.UTF8.GetBytes(buff.ToString());
+        }
+
+        /* If needed someday, convert to use JsonNode.
+        /// <summary>
+        /// Convert the body string into an OSDMap.
+        /// If the body starts with '{' we assume it's JSON formatted.
+        /// Otherwise we assume it's key=value&key=value form.
+        /// </summary>
+        /// <param name="body"></param>
+        /// <returns></returns>
+        public OMVSD.OSDMap MapizeTheBody(string body) {
+            OMVSD.OSDMap retMap = new OMVSD.OSDMap();
+            if (body.Length > 0 && body.Substring(0, 1).Equals("{")) { // kludge test for JSON formatted body
+                try {
+                    retMap = (OMVSD.OSDMap)OMVSD.OSDParser.DeserializeJson(body);
+                } catch (Exception e) {
+                    m_log.Log(MBLogLevel.DRESTDETAIL, "Failed parsing of JSON body: " + e.ToString());
+                }
+            } else {
+                try {
+                    string[] amp = body.Split('&');
+                    if (amp.Length > 0) {
+                        foreach (string kvp in amp) {
+                            string[] kvpPieces = kvp.Split('=');
+                            if (kvpPieces.Length == 2) {
+                                retMap.Add(kvpPieces[0].Trim(), new OMVSD.OSDString(kvpPieces[1].Trim()));
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    m_log.Log(MBLogLevel.DRESTDETAIL, "Failed parsing of query body: " + e.ToString());
+                }
+            }
+            return retMap;
+        }
+        */
+
+        public JsonNode GetDump() {
+            var stats = new JsonObject();
+            stats["handlers"] = m_handlers.Count;
+            stats["port"] = Port;
+            stats["requests"] = m_statRequests.GetDump();
+            stats["nohandlers"] = m_statNoHandlers.GetDump();
+            return stats;
+        }
+
+        #endregion HTML Helper Routines
+
+    }
+}

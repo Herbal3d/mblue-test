@@ -11,14 +11,12 @@
 
 using System.Reflection;
 
-namespace org.herbal3d.mblue.Config
-{
+namespace org.herbal3d.mblue.Config {
 
-    public class MBlueConfig
-    {
+    public class MBlueConfig {
         public const string subSectionName = "MBlue";
 
-        public string AppTitle { get; set; } = "MBlue Test";
+        public string AppName { get; set; } = "MBlue Test";
     }
 }
 

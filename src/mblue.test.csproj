@@ -48,6 +48,16 @@
     </Content>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+    <None Include="..\..\LICENSE" Pack="true" PackagePath="\" />
+    <None Include="..\..\assets\**\*.*"
+          Pack="true"
+          PackagePath="contentFiles/any/any/assets/%(RecursiveDir)%(Filename)%(Extension)"
+          PackageCopyToOutput="true" />
+  </ItemGroup>
+
+
 
 
 </Project>

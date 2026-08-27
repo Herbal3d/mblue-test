@@ -19,8 +19,10 @@ using Microsoft.Extensions.Options;
 using NLog.Extensions.Logging;
 
 using org.herbal3d.mblue.Config;
+using org.herbal3d.mblue.Common;
 using org.herbal3d.mblue.ecm;
 using org.herbal3d.mblue.Logging;
+using org.herbal3d.mblue.Rest;
 
 namespace org.herbal3d.mblue {
 
@@ -104,6 +106,13 @@ namespace org.herbal3d.mblue {
                      // Logger and MBLogger wrapper for base logger
                      services.Configure<MBLoggerConfig>(context.Configuration.GetSection(MBLoggerConfig.subSectionName));
                      services.AddTransient(typeof(MBLogger<>));
+
+                     // The test routine has a REST interface for interaction
+                     services.AddTransient<RestHandlerDumpable>();
+                     services.AddTransient<RestHandlerStatic>();
+                     services.AddTransient<RestHandlerStats>();
+                     services.AddTransient<RestHandlerUI>();
+                     services.AddHostedService<RestManager>();
 
                      MBlueECMServiceSetup.AddServices(services, context.Configuration);
 
