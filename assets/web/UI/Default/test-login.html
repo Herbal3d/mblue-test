@@ -2,8 +2,8 @@
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>KeeKee</title>
-<link rel="stylesheet" href="/static/KeeKee.css" type="text/css">
+<title>MBlue</title>
+<link rel="stylesheet" href="/static/mblue.css" type="text/css">
 <script type="application/javascript" src="/std/jquery.js"></script>
 <script type="application/javascript" src="/std/jquery.form.js"></script>
 <script type="application/javascript">
@@ -14,39 +14,39 @@ $(document).ready(function() {
         }
     };
 
-    $('KKLoginForm').ajaxForm(formOptions);
+    $('MBLoginForm').ajaxForm(formOptions);
     // var timerHande = SetTimeout(fetchLoginStuff, 1000);
     // var statHandle = SetTimeout(fetchDataStuff, 1000);
 } 
 );
 </script>
 </head>
-<body id="KKBody">
-<div id="KKContent">
-<form id="KKLoginForm" action="/api/LLLP/connection/login" method="post">
-    <ul class="KKLogin">
-        <li class="KKLogin">
-            <span class="KKLoginLabel">First</span>
-            <span class="KKLoginValue"><input type="text" name="LOGINFIRST"/></span>
+<body id="MBBody">
+<div id="MBContent">
+<form id="MBLoginForm" action="/api/LLLP/connection/login" method="post">
+    <ul class="MBLogin">
+        <li class="MBLogin">
+            <span class="MBLoginLabel">First</span>
+            <span class="MBLoginValue"><input type="text" name="LOGINFIRST"/></span>
         </li>
-        <li class="KKLogin">
-            <span class="KKLoginLabel">Last</span>
-            <span class="KKLoginValue"><input type="text" name="LOGINLAST"/></span>
+        <li class="MBLogin">
+            <span class="MBLoginLabel">Last</span>
+            <span class="MBLoginValue"><input type="text" name="LOGINLAST"/></span>
         </li>
-        <li class="KKLogin">
-            <span class="KKLoginLabel">Password</span>
-            <span class="KKLoginValue"><input type="password" name="LOGINPASS"/></span>
+        <li class="MBLogin">
+            <span class="MBLoginLabel">Password</span>
+            <span class="MBLoginValue"><input type="password" name="LOGINPASS"/></span>
         </li>
-        <li class="KKLogin">
-            <span class="KKLoginLabel">Grid</span>
-            <span class="KKLoginValue"><input type="text" name="LOGINGRID"/></span>
+        <li class="MBLogin">
+            <span class="MBLoginLabel">Grid</span>
+            <span class="MBLoginValue"><input type="text" name="LOGINGRID"/></span>
         </li>
-        <li class="KKLogin">
-            <span class="KKLoginLabel">Sim</span>
-            <span class="KKLoginValue"><input type="text" name="LOGINSIM"/></span>
+        <li class="MBLogin">
+            <span class="MBLoginLabel">Sim</span>
+            <span class="MBLoginValue"><input type="text" name="LOGINSIM"/></span>
         </li>
     </ul>
-    <span class="KKLoginSubmit">
+    <span class="MBLoginSubmit">
         <input type="submit" value="Login"/>
     </span>
 </div>

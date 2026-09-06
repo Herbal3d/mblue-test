@@ -19,6 +19,7 @@ using Microsoft.Extensions.Options;
 using NLog.Extensions.Logging;
 
 using org.herbal3d.mblue.Config;
+using org.herbal3d.mblue.comm;
 using org.herbal3d.mblue.Common;
 using org.herbal3d.mblue.ecm;
 using org.herbal3d.mblue.Logging;
@@ -112,9 +113,13 @@ namespace org.herbal3d.mblue {
                      services.AddTransient<RestHandlerStatic>();
                      services.AddTransient<RestHandlerStats>();
                      services.AddTransient<RestHandlerUI>();
-                     services.AddHostedService<RestManager>();
+                     services.AddSingleton<RestHandlerFactory>();
+                     services.AddSingleton<RestManager>();
+                     services.AddHostedService(sp => sp.GetRequiredService<RestManager>());
 
                      MBlueECMServiceSetup.AddServices(services, context.Configuration);
+
+                     MBlueCommServiceSetup.AddServices(services, context.Configuration);
 
                      // TODO: add more
 
@@ -138,6 +143,12 @@ namespace org.herbal3d.mblue {
                 .GetCustomAttribute<System.Reflection.AssemblyInformationalVersionAttribute>()
                 ?.InformationalVersion ?? "unknown";
             m_log.LogInformation("MBlue.ECM Version: {version}", mblue_ecm_version);
+
+            // Get the version of MBlue.comm from its assembly attribute
+            string mblue_comm_version = typeof(MBlueCommServiceSetup).Assembly
+                .GetCustomAttribute<System.Reflection.AssemblyInformationalVersionAttribute>()
+                ?.InformationalVersion ?? "unknown";
+            m_log.LogInformation("MBlue.comm Version: {version}", mblue_comm_version);
 
             LogConfigurationComplete(m_log);
 

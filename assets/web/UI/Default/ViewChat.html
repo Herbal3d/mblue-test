@@ -2,10 +2,10 @@
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>KeeKee Chat</title>
-<link rel="stylesheet" href="/UI/KeeKee.css" type="text/css"/>
+<title>MBlue Chat</title>
+<link rel="stylesheet" href="/UI/mblue.css" type="text/css"/>
 <script type="text/javascript" src="/static/jquery.js?xx=4"></script>
-<script type="text/javascript" src="/static/KKScripts.js?xx=4"></script>
+<script type="text/javascript" src="/static/MBScripts.js?xx=4"></script>
 <noscript>
 <p color="red">
 Your browser does not support Javascript. This won't work for you.
@@ -14,10 +14,10 @@ Your browser does not support Javascript. This won't work for you.
 <script type="text/javascript">
 $(document).ready(function() {
     // setup form to post info when 'Login' is pressed
-    $("#KKChatForm").submit(SendChatSay);
-    $("#KKSayButton").click(SendChatSay);
-    $("#KKWhisperButton").click(SendChatWhisper);
-    $("#KKShoutButton").click(SendChatShout);
+    $("#MBChatForm").submit(SendChatSay);
+    $("#MBSayButton").click(SendChatSay);
+    $("#MBWhisperButton").click(SendChatWhisper);
+    $("#MBShoutButton").click(SendChatShout);
 
     // Start the timed functions
     var now = new Date();
@@ -53,8 +53,8 @@ function TimerChatStuff() {
 
 function FormatChatLine(chatInfo) {
     var chatLine = new StringBuffer();
-    chatLine.append('<div class="KKChatLine">');
-    chatLine.append('<span class="KKChatLineTime">');
+    chatLine.append('<div class="MBChatLine">');
+    chatLine.append('<span class="MBChatLineTime">');
     chatLine.append('(');
     chatLine.append(chatInfo['Time'].substring(8,10));
     chatLine.append(':');
@@ -63,10 +63,10 @@ function FormatChatLine(chatInfo) {
     chatLine.append(chatInfo['Time'].substring(12,14));
     chatLine.append(')');
     chatLine.append(' </span>');
-    chatLine.append('<span class="KKChatLineFrom">');
+    chatLine.append('<span class="MBChatLineFrom">');
     chatLine.append(chatInfo['From']);
     chatLine.append('</span>');
-    chatLine.append('<span class="KKChatLineExpression">');
+    chatLine.append('<span class="MBChatLineExpression">');
     if (chatInfo['Type'] == 'Whisper') {
         chatLine.append(' whispers ');
     }
@@ -80,7 +80,7 @@ function FormatChatLine(chatInfo) {
         }
     }
     chatLine.append('</span>');
-    chatLine.append('<span class="KKChatLineText ' + chatInfo['EntryType'] + '">');
+    chatLine.append('<span class="MBChatLineText ' + chatInfo['EntryType'] + '">');
     chatLine.append(chatInfo['Message']);
     chatLine.append('</span>');
     chatLine.append('</div>');
@@ -88,9 +88,9 @@ function FormatChatLine(chatInfo) {
 }
 
 function PlaceLineInChatDisplay(chatLine) {
-    $('#KKChatText').append(chatLine);
-    if ($('#KKChatText').children().size() > 20) {
-        $('#KKChatText').find('div:first-child').remove();
+    $('#MBChatText').append(chatLine);
+    if ($('#MBChatText').children().size() > 20) {
+        $('#MBChatText').find('div:first-child').remove();
     }
 }
 
@@ -108,8 +108,8 @@ function SendChatShout() {
 
 function SendChat(expression) {
     var chatt = {};
-    var msg = $('#KKChatInput').text();
-    $('#KKChatInput').empty();
+    var msg = $('#MBChatInput').text();
+    $('#MBChatInput').empty();
     var chan = '0';
     var chanPattern = /^\/(\d+) (.*)$/;
     var checkChan = chanPattern.exec(msg);
@@ -141,27 +141,27 @@ function DebugLog(msg) {
 
 </script>
 </head>
-<body id="KKBody">
-<div id="KKHeader"></div>
-<div id="KKContent">
+<body id="MBBody">
+<div id="MBHeader"></div>
+<div id="MBContent">
 <!-- ============================================== -->
-<div class="KKChatContainer">
-<div id="KKChat">
-<form id="KKChatForm">
-    <div id="KKChatText"></div>
-    <div id="KKChatInputArea">
-    <textarea id="KKChatInput" onKeyPress="checkEnter(event)"
+<div class="MBChatContainer">
+<div id="MBChat">
+<form id="MBChatForm">
+    <div id="MBChatText"></div>
+    <div id="MBChatInputArea">
+    <textarea id="MBChatInput" onKeyPress="checkEnter(event)"
             name="chatinput" rows="1" cols="40"></textarea>
-    <input id="KKSayButton" type="button" type="button" value="Say"/>
-    <input id="KKWhisperButton" type="button" type="button" value="Whisper"/>
-    <input id="KKShoutButton" type="button" type="button" value="Shout"/>
-    </div> <!-- KKChatInputArea -->
+    <input id="MBSayButton" type="button" type="button" value="Say"/>
+    <input id="MBWhisperButton" type="button" type="button" value="Whisper"/>
+    <input id="MBShoutButton" type="button" type="button" value="Shout"/>
+    </div> <!-- MBChatInputArea -->
 </form>
-</div>  <!-- KKChat -->
-</div>  <!-- KKChatContainer -->
+</div>  <!-- MBChat -->
+</div>  <!-- MBChatContainer -->
 <!-- ============================================== -->
-</div>  <!-- KKContent -->
+</div>  <!-- MBContent -->
 <div id="DEBUG"></div>
-<div id="KKFooter"></div>
+<div id="MBFooter"></div>
 </body>
 </html>

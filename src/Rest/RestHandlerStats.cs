@@ -40,7 +40,7 @@ namespace org.herbal3d.mblue.Rest {
                                 Utilities.JoinFilePieces(pRestManager.APIBase, "/stats")) {
             m_log = pLogger;
             m_restConfig = pRestConfig;
-            m_commConfig = pCommConfig;
+            // m_commConfig = pCommConfig;
             m_ECMFactory = pECMFactory;
             m_commProvider = pCommProvider;
         }

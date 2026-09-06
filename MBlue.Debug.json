@@ -1,8 +1,8 @@
 {
-  "MBLogger": {
-    "LogLevel": "Debug",
-    // To select detailed log levels, set "LogLevel" to "" and set "LogSelections" to
-    // a comma-separated list of log levels, e.g. "Critical,Error,Warning,Information,DBADERROR"
-    "LogSelections": "Critical,Error,Warning,Information,DBADERROR"
-  }
+    "MBLogger": {
+        "LogLevel": "Debug",
+        // To select detailed log levels, set "LogLevel" to "" and set "LogSelections" to
+        // a comma-separated list of log levels, e.g. "Critical,Error,Warning,Information,DBADERROR"
+        "LogSelections": "DINIT,DINITDETAIL,DREST,DRESTDETAIL,DUI,DUIDETAIL,DCOMM,DCOMMDETAIL"
+    }
 }

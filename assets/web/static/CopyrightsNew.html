@@ -3,29 +3,29 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>KeeKee Copyrights</title>
-<link rel="stylesheet" href="/UI/KeeKee.css" type="text/css">
+<link rel="stylesheet" href="/UI/mblue.css" type="text/css">
 <script type="application/javascript" src="/static/jquery.js"></script>
-<script type="application/javascript" src="/static/LGScripts.js"></script>
+<script type="application/javascript" src="/static/MBScripts.js"></script>
 <script type="application/javascript">
 $(document).ready(function() {
     var BASEURL='http://127.0.0.1:9144';
-    $.getJSON(BASEURL+'/std/Copyrights.json', function(data, status) {
+    $.getJSON(BASEURL+'/static/Copyrights.json', function(data, status) {
         if (status == 'success') {
-            BuildBasicTable('#LGCopyrights', data, false);
+            BuildBasicTable('#MBCopyrights', data, false);
         }
     });
 });
 </script>
 </head>
-<body id="LGBody">
-    <div id="LGContent">
+<body id="MBBody">
+    <div id="MBContent">
     <h1>Copyrights</h1>
     <p>
     KeeKee is built upon the great work of many creative people.
     They have shared by licensing their works and, as per the license
     agreements, here are the copyrights for the various components.
     </p>
-    <div id="LGCopyrights"></div>
+    <div id="MBCopyrights"></div>
     </div>
 </body>
 </html>

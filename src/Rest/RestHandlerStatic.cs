@@ -41,10 +41,10 @@ namespace org.herbal3d.mblue.Rest {
             m_restConfig = pRestConfig;
 
             BaseUIDir = m_restConfig.Value.UIContentDir;
-            if (!BaseUIDir.EndsWith("/")) BaseUIDir += "/";
+            if (!BaseUIDir.EndsWith('/')) BaseUIDir += "/";
 
             StaticDir = Utilities.JoinFilePieces(BaseUIDir, Prefix);
-            if (!StaticDir.EndsWith("/")) StaticDir += "/";
+            if (!StaticDir.EndsWith('/')) StaticDir += "/";
 
             m_log.Log(MBLogLevel.DRESTDETAIL, "baseUIDir={0}, staticDir={1}, Prefix={2}",
                      BaseUIDir, StaticDir, Prefix);

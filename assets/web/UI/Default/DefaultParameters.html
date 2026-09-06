@@ -2,10 +2,10 @@
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>KeeKee</title>
-<link rel="stylesheet" href="/static/KeeKee.css" type="text/css"/>
-<script type="application/javascript" src="/std/jquery.js"></script>
-<script type="application/javascript" src="/std/KKScripts.js"></script>
+<title>MBlue</title>
+<link rel="stylesheet" href="/static/mblue.css" type="text/css"/>
+<script type="application/javascript" src="/static/jquery.js"></script>
+<script type="application/javascript" src="/static/MBScripts.js"></script>
 <script type="application/javascript">
 $(document).ready(function() {
     GetDefaultParameters();
@@ -20,34 +20,34 @@ function GetDefaultParameters() {
         timeout: 5000,
         success: function(data, status) {
             if (status == 'success') {
-                BuildBasicTable('#KKDefaultParameters', data, true, false);
+                BuildBasicTable('#MBDefaultParameters', data, true, false);
             }
         },
         error: function(xmlHTTPRequest, errorType) {
-            $('#KKDefaultParameters').append('Could not read parameters');
+            $('#MBDefaultParameters').append('Could not read parameters');
         }
     });
 };
 
 </script>
 </head>
-<body id="KKBody">
-<div id="KKHeader"></div>
-<div id="KKContent">
+<body id="MBBody">
+<div id="MBHeader"></div>
+<div id="MBContent">
 
-<div class="KKSectionContainer">
-<a class="KKSectionHeader" href="#">Default Parameters</a>
-<p>These are all the parameters that can be modified in KeeKee.
+<div class="MBSectionContainer">
+<a class="MBSectionHeader" href="#">Default Parameters</a>
+<p>These are all the parameters that can be modified in MBlue.
 The values given are the default values. The "settings.file" file
-(usually "KeeKee.json") overrides any of these values.
+(usually "mblue.json") overrides any of these values.
 </p>
-<div id="KKDefaultParameters" class="KKSection">
-</div>  <!-- KKDefaultParameters -->
-</div>  <!-- KKSectionContainer -->
+<div id="MBDefaultParameters" class="MBSection">
+</div>  <!-- MBDefaultParameters -->
+</div>  <!-- MBSectionContainer -->
 
 <!-- ============================================== -->
-</div>  <!-- KKContent -->
+</div>  <!-- MBContent -->
 <div id="DEBUG"></div>
-<div id="KKFooter"></div>
+<div id="MBFooter"></div>
 </body>
 </html>

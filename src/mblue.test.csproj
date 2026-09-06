@@ -33,11 +33,11 @@
     <PackageReference Include="mblue.ecm" Version="*" />
   </ItemGroup>
 
-  <ItemGroup Condition="Exists('../../mblue-comm/src/mblue.comm.Interface/mblue.comm.Interface.csproj')">
-    <ProjectReference Include="../../mblue-comm/src/mblue.comm.Interface/mblue.comm.Interface.csproj" />
+  <ItemGroup Condition="Exists('../../mblue-comm/src/mblue.comm/mblue.comm.csproj')">
+    <ProjectReference Include="../../mblue-comm/src/mblue.comm/mblue.comm.csproj" />
   </ItemGroup>
-  <ItemGroup Condition="!Exists('../../mblue-comm/src/mblue.comm.Interface/mblue.comm.Interface.csproj')">
-    <PackageReference Include="mblue.comm.Interface" Version="*" />
+  <ItemGroup Condition="!Exists('../../mblue-comm/src/mblue.comm/mblue.comm.csproj')">
+    <PackageReference Include="mblue.comm" Version="*" />
   </ItemGroup>
 
   <ItemGroup>
@@ -49,12 +49,20 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
-    <None Include="..\..\LICENSE" Pack="true" PackagePath="\" />
-    <None Include="..\..\assets\**\*.*"
-          Pack="true"
-          PackagePath="contentFiles/any/any/assets/%(RecursiveDir)%(Filename)%(Extension)"
-          PackageCopyToOutput="true" />
+    <Content Include="..\README.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="..\LICENSE">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="..\assets\**\*"
+                Exclude="*.ts;*.js.map">
+      <LinkBase>assets</LinkBase>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
   </ItemGroup>
 
 

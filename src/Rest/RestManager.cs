@@ -85,7 +85,7 @@ namespace org.herbal3d.mblue.Rest {
             BaseURL = pConfig.Value.BaseURL + ":" + pConfig.Value.Port.ToString();
             Port = pConfig.Value.Port;
 
-            m_log.Log(MBLogLevel.DREST, "RestManager constructor");
+            m_log.Log(MBLogLevel.DREST, "RestManager constructor. BaseURL: {0}", BaseURL);
         }
 
         protected override async Task ExecuteAsync(CancellationToken cancellationToken) {

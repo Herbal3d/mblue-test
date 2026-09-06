@@ -1,0 +1,45 @@
+/* MBlue Viewer - Color Definitions
+ * Define all colors as CSS custom properties (variables)
+ * Include this file BEFORE mblue.css in your HTML
+ */
+
+:root {
+    /* Background colors */
+    --mb-body-bg: #4A5F6D;
+    --mb-stats-bg: #5A6F7D;
+    --mb-stats-section-bg: #3A4F5D;
+    --mb-chat-bg: #668396;
+    --mb-pre-bg: #8080B0;
+
+    --mb-dialog-accent: #606080;
+    --mb-dialog-button-bg: #505070;
+    --mb-dialog-button-color: #FFFFFF;
+    
+    /* Text colors */
+    --mb-text-primary: #EEEAD6;
+    --mb-text-secondary: #c0c0c0;
+    --mb-text-muted: #808080;
+    --mb-text-black: #000000;
+    
+    /* Link colors */
+    --mb-link-color: #ffffff;
+    --mb-link-visited: #d0d0d0;
+    
+    /* Chat colors */
+    --mb-chat-time: #c0c0c0;
+    --mb-chat-from: #f09090;
+    --mb-chat-expression: yellow;
+    --mb-chat-status-blue: #303090;
+    --mb-chat-status-darkblue: #0000FF;
+    --mb-chat-linden: yellow;
+    --mb-chat-object: yellow;
+    --mb-chat-alert: red;
+    --mb-chat-error: red;
+    
+    /* Avatar colors */
+    --mb-avatar-name: #f09090;
+    --mb-avatar-region: #c0c0c0;
+    
+    /* Border colors */
+    --mb-border-color: #808080;
+}

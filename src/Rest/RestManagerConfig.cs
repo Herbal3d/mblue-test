@@ -24,7 +24,7 @@ public class RestManagerConfig {
     // Base URL for rest interfaces
     public string BaseURL { get; set; } = "http://localhost";
     // CSS file for rest display
-    public string CSSLocalURL { get; set; } = "/static/KeeKee.css";
+    public string CSSLocalURL { get; set; } = "/static/mblue.css";
     // Directory for static HTML content
     public string UIContentDir { get; set; } =
             Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "assets/web");

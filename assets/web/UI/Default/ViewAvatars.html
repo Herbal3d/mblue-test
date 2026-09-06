@@ -2,10 +2,10 @@
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>KeeKee</title>
-<link rel="stylesheet" href="/static/KeeKee.css?xx=6" type="text/css"/>
-<script type="text/javascript" src="/std/jquery.js?xx=6"></script>
-<script type="text/javascript" src="/std/KKScripts.js?xx=6"></script>
+<title>MBlue</title>
+<link rel="stylesheet" href="/static/mblue.css?xx=6" type="text/css"/>
+<script type="text/javascript" src="/static/jquery.js?xx=6"></script>
+<script type="text/javascript" src="/static/MBScripts.js?xx=6"></script>
 <noscript>
 <p color="red">
 Your browser does not support Javascript. This won't work for you.
@@ -14,17 +14,17 @@ Your browser does not support Javascript. This won't work for you.
 <script type="text/javascript">
 $(document).ready(function() {
     // setup form to post info when 'Login' is pressed
-    $("#KKLoginForm").submit(SendLoginRequest);
+    $("#MBLoginForm").submit(SendLoginRequest);
     // other buttons cause their actions
-    $("#KKNavTeleportButton").click(DoTeleport);
-    $("#KKNavLogoutButton").click(DoLogout);
-    $("#KKNavExitButton").click(DoExit);
+    $("#MBNavTeleportButton").click(DoTeleport);
+    $("#MBNavLogoutButton").click(DoLogout);
+    $("#MBNavExitButton").click(DoExit);
 
     // Major divisions in the content accordioning
-    $('.KKSectionContent').hide('slow');
-    $('#KKLogin').show('slow');
-    $('#KKLoginFirst').focus();
-    $('.KKSectionHeader').click(function() {
+    $('.MBSectionContent').hide('slow');
+    $('#MBLogin').show('slow');
+    $('#MBLoginFirst').focus();
+    $('.MBSectionHeader').click(function() {
         $(this).next().slideToggle('slow');
         return false;
     });
@@ -73,25 +73,25 @@ function TimerLoginStuff(firstTime) {
 
 // given a set of login status parameters, update login status area
 function UpdateLoginArea(data) {
-    $('#KKLoginMessage').empty();
-    if (data.msg.value) $('#KKLoginMessage').append(data.msg.value);
+    $('#MBLoginMessage').empty();
+    if (data.msg.value) $('#MBLoginMessage').append(data.msg.value);
 
     if(data.loginstate.value == 'logout') {
-        $("#KKLoginForm").show('slow');
-        $("#KKAvatarView").hide('slow');
+        $("#MBLoginForm").show('slow');
+        $("#MBAvatarView").hide('slow');
     }
     else {
-        $("#KKLoginForm").hide('slow');
-        $("#KKAvatarView").show('slow');
+        $("#MBLoginForm").hide('slow');
+        $("#MBAvatarView").show('slow');
     }
 }
 
 // Called the first time so we can pre-populate the form
 function InitializeLoginForm(data) {
-    $('#KKLoginForm input[name="LOGINFIRST"]').attr('value', data.first.value);
-    $('#KKLoginForm input[name="LOGINLAST"]').attr('value', data.last.value);
-    $('#KKLoginForm input[name="LOGINSIM"]').attr('value', data.sim.value);
-    var selector = $('#KKLoginForm select[name="LOGINGRID"]');
+    $('#MBLoginForm input[name="LOGINFIRST"]').attr('value', data.first.value);
+    $('#MBLoginForm input[name="LOGINLAST"]').attr('value', data.last.value);
+    $('#MBLoginForm input[name="LOGINSIM"]').attr('value', data.sim.value);
+    var selector = $('#MBLoginForm select[name="LOGINGRID"]');
     selector.empty();
     for (grid in data.possiblegrids.value) {
         var valu = data.possiblegrids.value[grid];
@@ -103,7 +103,7 @@ function InitializeLoginForm(data) {
 // Called by login form 'submit' click
 // Post the user's parameters to the viewer to login the user
 function SendLoginRequest() {
-    $.post(BASEURL + "/api/LLLP/connect/login", $('#KKLoginForm').serializeArray());
+    $.post(BASEURL + "/api/LLLP/connect/login", $('#MBLoginForm').serializeArray());
     return false;
 }
 
@@ -115,8 +115,8 @@ function TimerAvatarStuff() {
     $.getJSON(BASEURL+'/api/avatars?yy=' + Math.floor(Math.random()*999999),
                 function(data, status) {
         if (status == 'success') {
-            // BuildBasicTable('#KKAvatars', data, false, true);
-            BuildColumnTable('#KKAvatars', data, false, true, false,
+            // BuildBasicTable('#MBAvatars', data, false, true);
+            BuildColumnTable('#MBAvatars', data, false, true, false,
                 ["Name", "Region", "X", "Y", "Z", "Distance"]);
         }
     });
@@ -125,7 +125,7 @@ function TimerAvatarStuff() {
 
 function DoTeleport() {
     var teleParms = new Object;
-    teleParms['DESTINATION'] = $('#KKNavDestinationText').text;
+    teleParms['DESTINATION'] = $('#MBNavDestinationText').text;
     $.post(BASEURL + "/api/LLLP/connect/teleport", teleParms);
     return false;
 }
@@ -156,16 +156,16 @@ function TimerStatStuff() {
                 var dataFPS = data['framespersecond']['value'];
                 var workQueue = data['betweenframeworkitems']['value'];
                 var sceneNodes = data['totalbetweenframecreatemeshscenenode']['value'];
-                $('#KKFooter').empty();
-                $('#KKFooter').append('<span id="KKFooterStats">' + dataFPS 
+                $('#MBFooter').empty();
+                $('#MBFooter').append('<span id="MBFooterStats">' + dataFPS 
                         + '/' + workQueue 
                         + '/' + sceneNodes 
                         + '</span>');
             }
         },
         error: function(xmlHTTPRequest, errorType) {
-            $('#KKFooter').empty();
-            $('#KKFooter').append('../../..');
+            $('#MBFooter').empty();
+            $('#MBFooter').append('../../..');
         }
     });
     statTimerProcessing = false;
@@ -173,22 +173,22 @@ function TimerStatStuff() {
 
 </script>
 </head>
-<body id="KKBody">
-<div id="KKHeader"></div>
-<div id="KKContent">
+<body id="MBBody">
+<div id="MBHeader"></div>
+<div id="MBContent">
 <!-- ============================================== -->
-<div class="KKSectionContainer">
-<a class="KKSectionHeader" href="#">Connection</a>
-<div id="KKLogin" class="KKSectionContent">
+<div class="MBSectionContainer">
+<a class="MBSectionHeader" href="#">Connection</a>
+<div id="MBLogin" class="MBSectionContent">
 
-<div id="KKLoginMessage"></div>
+<div id="MBLoginMessage"></div>
 
-<form id="KKLoginForm">
-    <ul class="KKLogin">
+<form id="MBLoginForm">
+    <ul class="MBLogin">
         <li>
             <span class="label">First</span>
             <span class="value">
-                <input type="text" tabindex="1" name="LOGINFIRST" id="KKLoginFirst"/>
+                <input type="text" tabindex="1" name="LOGINFIRST" id="MBLoginFirst"/>
             </span>
         </li>
         <li>
@@ -218,40 +218,40 @@ function TimerStatStuff() {
             </span>
         </li>
     </ul>
-    <span class="KKLoginSubmit">
+    <span class="MBLoginSubmit">
         <input type="submit" tabindex="6" value="Login"/>
     </span>
 </form>
-</div>  <!-- KKLogin -->
-</div>  <!-- KKSectionContainer -->
+</div>  <!-- MBLogin -->
+</div>  <!-- MBSectionContainer -->
 <!-- ============================================== -->
-<div class="KKSectionContainer">
-<a class="KKSectionHeader" href="#">Navigation</a>
-<div id="KKNavgationView" class="KKSectionContent">
+<div class="MBSectionContainer">
+<a class="MBSectionHeader" href="#">Navigation</a>
+<div id="MBNavgationView" class="MBSectionContent">
 
-<div id="KKNavigation">
-<form id="KKNavigationForm">
-<div id="KKNavigationInputArea">
-    <input id="KKNavDestinationText" type="text" name="DESTINATION" size="20"/>
-    <input id="KKNavTeleportButton" type="button" value="Teleport"/>
-    <input id="KKNavLogoutButton" type="button" value="Logout"/>
-    <input id="KKNavExitButton" type="button" value="Exit"/>
+<div id="MBNavigation">
+<form id="MBNavigationForm">
+<div id="MBNavigationInputArea">
+    <input id="MBNavDestinationText" type="text" name="DESTINATION" size="20"/>
+    <input id="MBNavTeleportButton" type="button" value="Teleport"/>
+    <input id="MBNavLogoutButton" type="button" value="Logout"/>
+    <input id="MBNavExitButton" type="button" value="Exit"/>
 </div>
 </form>
-</div>  <!-- KKNavigation -->
-</div>  <!-- KKSectionContainer -->
+</div>  <!-- MBNavigation -->
+</div>  <!-- MBSectionContainer -->
 <!-- ============================================== -->
-<div class="KKSectionContainer">
-<a class="KKSectionHeader" href="#">Avatars</a>
-<div id="KKAvatarView" class="KKSectionContent">
+<div class="MBSectionContainer">
+<a class="MBSectionHeader" href="#">Avatars</a>
+<div id="MBAvatarView" class="MBSectionContent">
 
-<div id="KKAvatars">
-</div>  <!-- KKAvatars -->
-</div>  <!-- KKSectionContainer -->
+<div id="MBAvatars">
+</div>  <!-- MBAvatars -->
+</div>  <!-- MBSectionContainer -->
 <!-- ============================================== -->
-</div>  <!-- KKContent -->
+</div>  <!-- MBContent -->
 <div id="DEBUG"></div>
-<div id="KKDialogSelection"></div>
-<div id="KKFooter"></div>
+<div id="MBDialogSelection"></div>
+<div id="MBFooter"></div>
 </body>
 </html>

@@ -59,4 +59,5 @@ docs/api/
 dist/
 artifacts/
 node_modules/
+package-lock.json
 
