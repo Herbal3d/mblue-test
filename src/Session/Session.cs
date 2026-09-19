@@ -9,25 +9,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Net;
-
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
+using System.Text.Json.Nodes;
 
 using org.herbal3d.mblue.Common;
 using org.herbal3d.mblue.Logging;
 
-namespace org.herbal3d.mblue.Rest {
+namespace org.herbal3d.mblue.Session {
 
-    public class RestHandlerFactory {
-        private readonly IServiceProvider m_serviceProvider;
+    public class Session : IDumpable {
 
-        public RestHandlerFactory(IServiceProvider pServiceProvider) {
-            m_serviceProvider = pServiceProvider;
+        private readonly MBLogger<Session> m_log;
+
+        public Session(MBLogger<Session> pLog
+                        ) {
+            m_log = pLog;
+
+            m_log.Log(MBLogLevel.DREST, "Session constructor");
         }
 
-        public RestHandler CreateHandler<T>(params object[] parameters) where T : RestHandler {
-            return ActivatorUtilities.CreateInstance<T>(m_serviceProvider, parameters);
+        public JsonNode? GetDump() {
+            return null;
         }
     }
 }
+

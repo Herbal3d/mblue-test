@@ -5,4 +5,6 @@
   <Project Path="../mblue-common/src/mblue.common.csproj" />
   <Project Path="../mblue-ecm/src/mblue.ecm/mblue.ecm.csproj" />
   <Project Path="../mblue-comm/src/mblue.comm.Interface/mblue.comm.Interface.csproj" />
+  <Project Path="../mblue-comm/src/mblue.comm/mblue.comm.csproj" />
+  <Project Path="../mblue-comm-os/src/mblue.comm.os.csproj" />
 </Solution>

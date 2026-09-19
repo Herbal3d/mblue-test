@@ -104,6 +104,9 @@ namespace org.herbal3d.mblue {
                      // The global cancellation token source that can be used to signal shutdown across the app.
                      services.AddSingleton(GlobalCTS);
 
+                     // Version information for the application and MBlue.Common assembly.
+                     services.AddSingleton<MBVersions>();
+
                      // Logger and MBLogger wrapper for base logger
                      services.Configure<MBLoggerConfig>(context.Configuration.GetSection(MBLoggerConfig.subSectionName));
                      services.AddTransient(typeof(MBLogger<>));
@@ -127,28 +130,34 @@ namespace org.herbal3d.mblue {
                  .Build();
 
             m_log = MBlueTestMain.GetService<MBLogger<MBlueTestMain>>();
-
             IOptions<MBlueConfig> mblueConfig = GetMBlueConfig;
 
-            m_log.LogInformation("MBlue Version: {version}", ThisAssembly.AssemblyInformationalVersion);
+            MBVersions mbVersion = MBlueTestMain.GetService<MBVersions>();
+            mbVersion.AppName = mblueConfig.Value.AppName;
+            mbVersion.AppVersion = ThisAssembly.AssemblyInformationalVersion;
+
+            m_log.LogInformation($"{mbVersion.AppName} Version: {mbVersion.AppVersion}");
 
             // Get the version of MBlue.Common from its assembly attribute
             string mblue_common_version = typeof(MBException).Assembly
                 .GetCustomAttribute<System.Reflection.AssemblyInformationalVersionAttribute>()
                 ?.InformationalVersion ?? "unknown";
             m_log.LogInformation("MBlue.Common Version: {version}", mblue_common_version);
+            mbVersion.AddOtherVersion("MBlue.Common", mblue_common_version);
 
             // Get the version of MBlue.ECM from its assembly attribute
             string mblue_ecm_version = typeof(MBlueECMServiceSetup).Assembly
                 .GetCustomAttribute<System.Reflection.AssemblyInformationalVersionAttribute>()
                 ?.InformationalVersion ?? "unknown";
             m_log.LogInformation("MBlue.ECM Version: {version}", mblue_ecm_version);
+            mbVersion.AddOtherVersion("MBlue.ECM", mblue_ecm_version);
 
             // Get the version of MBlue.comm from its assembly attribute
             string mblue_comm_version = typeof(MBlueCommServiceSetup).Assembly
                 .GetCustomAttribute<System.Reflection.AssemblyInformationalVersionAttribute>()
                 ?.InformationalVersion ?? "unknown";
             m_log.LogInformation("MBlue.comm Version: {version}", mblue_comm_version);
+            mbVersion.AddOtherVersion("MBlue.comm", mblue_comm_version);
 
             LogConfigurationComplete(m_log);
 

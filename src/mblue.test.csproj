@@ -9,13 +9,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.10" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="10.0.10" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.10" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.10" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.10" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.10" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.10" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.12" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="10.0.12" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.12" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.12" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.12" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.12" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.12" />
     <PackageReference Include="NLog.Extensions.Logging" Version="6.1.0"/>
   </ItemGroup>
 
@@ -38,6 +38,13 @@
   </ItemGroup>
   <ItemGroup Condition="!Exists('../../mblue-comm/src/mblue.comm/mblue.comm.csproj')">
     <PackageReference Include="mblue.comm" Version="*" />
+  </ItemGroup>
+
+  <ItemGroup Condition="Exists('../../mblue-comm-os/src/mblue.comm.os.csproj')">
+    <ProjectReference Include="../../mblue-comm-os/src/mblue.comm.os.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="!Exists('../../mblue-comm-os/src/mblue.comm.os.csproj')">
+    <PackageReference Include="mblue.comm.os" Version="*" />
   </ItemGroup>
 
   <ItemGroup>
@@ -64,8 +71,5 @@
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
   </ItemGroup>
-
-
-
 
 </Project>
