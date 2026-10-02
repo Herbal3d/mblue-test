@@ -50,9 +50,11 @@ namespace org.herbal3d.mblue.Session {
             m_log.Log(MBLogLevel.DRESTDETAIL, "POST: " + (pRequest?.Url?.ToString() ?? "UNKNOWN"));
 
             string strBody = "";
-            using (StreamReader rdr = new StreamReader(pRequest.InputStream)) {
-                strBody = rdr.ReadToEnd();
-                // m_log.Log(MBLogLevel.DRESTDETAIL, "APIPostHandler: Body: '" + strBody + "'");
+            if (pRequest is not null) {
+                using (StreamReader rdr = new StreamReader(pRequest.InputStream)) {
+                    strBody = rdr.ReadToEnd();
+                    // m_log.Log(MBLogLevel.DRESTDETAIL, "APIPostHandler: Body: '" + strBody + "'");
+                }
             }
             try {
                 JsonNode? jsonBody = JsonNode.Parse(strBody);
@@ -61,7 +63,7 @@ namespace org.herbal3d.mblue.Session {
                     string destination = jsonBody["DESTINATION"]?.ToString() ?? "";
                     m_log.Log(MBLogLevel.DRESTDETAIL, "Teleport request to " + destination);
 
-                    bool result = await m_commProvider.StartTeleport(destination);
+                    bool result = await m_commProvider.StartTeleport(destination, pCancelToken).ConfigureAwait(false);
 
                     JsonNode respJson = new JsonObject();
                     if (result) {

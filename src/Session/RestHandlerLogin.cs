@@ -52,16 +52,18 @@ namespace org.herbal3d.mblue.Session {
             m_log.Log(MBLogLevel.DRESTDETAIL, "POST: " + (pRequest?.Url?.ToString() ?? "UNKNOWN"));
 
             string strBody = "";
-            using (StreamReader rdr = new StreamReader(pRequest.InputStream)) {
-                strBody = rdr.ReadToEnd();
-                // m_log.Log(MBLogLevel.DRESTDETAIL, "APIPostHandler: Body: '" + strBody + "'");
+            if (pRequest is not null) {
+                using (StreamReader rdr = new StreamReader(pRequest.InputStream)) {
+                    strBody = rdr.ReadToEnd();
+                    // m_log.Log(MBLogLevel.DRESTDETAIL, "APIPostHandler: Body: '" + strBody + "'");
+                }
             }
             try {
                 JsonNode? body = JsonNode.Parse(strBody);
                 LoginParams loginParams = new LoginParams();
                 loginParams.FromJson(body);
 
-                LoginResponse? result = await m_commProvider.StartLogin(loginParams);
+                LoginResponse? result = await m_commProvider.StartLogin(loginParams, pCancelToken).ConfigureAwait(false);
 
                 JsonObject respMap = new JsonObject();
                 if (result is not null && result.Success) {

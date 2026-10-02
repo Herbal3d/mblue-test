@@ -4,4 +4,4 @@
 // Licensed under Mozilla Public License 2.0
 // See LICENSE file in top directory for details.
 // ===========================================
-//# sourceMappingURL=MB-Scripts.js.map
+//# sourceMappingURL=MBScripts.js.map

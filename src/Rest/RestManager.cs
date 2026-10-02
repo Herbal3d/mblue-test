@@ -128,13 +128,13 @@ namespace org.herbal3d.mblue.Rest {
                                 string afterString = absURL.Substring(thisHandler.Prefix.Length);
                                 switch (request.HttpMethod.ToUpper()) {
                                     case "GET":
-                                        await thisHandler.ProcessGetRequest(context, request, response, cancellationToken);
+                                        await thisHandler.ProcessGetRequest(context, request, response, cancellationToken).ConfigureAwait(false);
                                         break;
                                     case "POST":
-                                        await thisHandler.ProcessPostRequest(context, request, response, cancellationToken);
+                                        await thisHandler.ProcessPostRequest(context, request, response, cancellationToken).ConfigureAwait(false);
                                         break;
                                     default:
-                                        await thisHandler.ProcesstOtherRequest(context, request, response, cancellationToken);
+                                        await thisHandler.ProcesstOtherRequest(context, request, response, cancellationToken).ConfigureAwait(false);
                                         break;
                                 }
                             } else {
@@ -145,7 +145,7 @@ namespace org.herbal3d.mblue.Rest {
                         } catch (Exception e) {
                             m_log.Log(MBLogLevel.Error, "RestManager listener exception: {0}", e.ToString());
                         }
-                    }, cancellationToken);
+                    }, cancellationToken).ConfigureAwait(false);
                 }
             } catch (OperationCanceledException) {
                 m_log.Log(MBLogLevel.DREST, "RestManager ExecuteAsync cancellation requested");
@@ -216,7 +216,7 @@ namespace org.herbal3d.mblue.Rest {
 
             pResponse.ContentLength64 = encodedBuff.Length;
             Stream output = pResponse.OutputStream;
-            await output.WriteAsync(encodedBuff, 0, encodedBuff.Length);
+            await output.WriteAsync(encodedBuff, 0, encodedBuff.Length).ConfigureAwait(false);
             output.Close();
 
             return;

@@ -31,8 +31,6 @@ namespace org.herbal3d.mblue {
 
         public static IHost? MBlueHost { get; private set; } = default!;
 
-        public static CancellationTokenSource GlobalCTS { get; } = new CancellationTokenSource();
-
         // Way to get the logger for those isolated routines that need to log errors
         private static MBLogger<MBlueTestMain>? m_log;
         public static MBLogger<MBlueTestMain> Log {
@@ -102,7 +100,7 @@ namespace org.herbal3d.mblue {
                      services.Configure<MBlueConfig>(context.Configuration.GetSection(MBlueConfig.subSectionName));
 
                      // The global cancellation token source that can be used to signal shutdown across the app.
-                     services.AddSingleton(GlobalCTS);
+                     services.AddSingleton<GlobalControl>();
 
                      // Version information for the application and MBlue.Common assembly.
                      services.AddSingleton<MBVersions>();
@@ -120,8 +118,11 @@ namespace org.herbal3d.mblue {
                      services.AddSingleton<RestManager>();
                      services.AddHostedService(sp => sp.GetRequiredService<RestManager>());
 
+                     // Add MBlue ECM services
                      MBlueECMServiceSetup.AddServices(services, context.Configuration);
 
+                     // Add MBlue Communication services.
+                     // This also adds the actual underlying communication services.
                      MBlueCommServiceSetup.AddServices(services, context.Configuration);
 
                      // TODO: add more
@@ -161,7 +162,7 @@ namespace org.herbal3d.mblue {
 
             LogConfigurationComplete(m_log);
 
-            await MBlueHost.RunAsync(GlobalCTS.Token);
+            await MBlueHost.RunAsync(GetService<GlobalControl>().GlobalCTS.Token);
 
             LogShutdown(m_log);
         }

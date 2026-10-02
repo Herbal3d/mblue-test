@@ -37,25 +37,26 @@ namespace org.herbal3d.mblue.Session {
                                 IOptions<RestManagerConfig> pRestConfig,
                                 RestManager pRestManager,
                                 ICommProvider pCommProvider,
-                                CancellationTokenSource pCancelToken
+                                GlobalControl pGlobalControl
                                 ) : base(pRestManager,
                                     Utilities.JoinFilePieces(pRestManager.APIBase, "Session/exit")) {
             m_log = pLogger;
             m_restConfig = pRestConfig;
             m_commProvider = pCommProvider;
-            m_cancelToken = pCancelToken;
+            m_cancelToken = pGlobalControl.GlobalCTS;
         }
 
         public override async Task ProcessPostRequest(HttpListenerContext pContext,
                                             HttpListenerRequest pRequest,
                                             HttpListenerResponse pResponse,
-                                            CancellationToken pCancelToken) {
+                                            CancellationToken pCancelToken
+                                            ) {
 
             m_log.Log(MBLogLevel.DRESTDETAIL, "POST: " + (pRequest?.Url?.ToString() ?? "UNKNOWN"));
 
             try {
                 // try a logout
-                m_commProvider.StartLogout();
+                _ = m_commProvider.StartLogout(pCancelToken);
                 // Send a simple response back to the client before exiting.
                 m_RestManager.DoSimpleResponse(pResponse, null, null);
                 // Also force the main loop to exit, which will cause the app to close.

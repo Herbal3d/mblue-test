@@ -49,7 +49,7 @@ namespace org.herbal3d.mblue.Session {
                 m_log.Log(MBLogLevel.DRESTDETAIL, "POST: " + (pRequest?.Url?.ToString() ?? "UNKNOWN"));
 
                 try {
-                    m_commProvider.StartLogout();
+                    _ = m_commProvider.StartLogout(pCancelToken);
                 } catch (Exception e) {
                     m_log.Log(MBLogLevel.DRESTDETAIL, "Logout exception: " + e.ToString());
                 }
