@@ -21,7 +21,7 @@ using Microsoft.Extensions.Options;
 
 namespace org.herbal3d.mblue.Rest {
 
-    public class RestHandlerStats : RestHandler {
+    public class RestHandlerCommStats : RestHandler {
 
         private readonly MBLogger<RestHandlerStats> m_log;
         private readonly IOptions<RestManagerConfig> m_restConfig;
@@ -31,13 +31,13 @@ namespace org.herbal3d.mblue.Rest {
         /// <summary>
         /// </summary>
 
-        public RestHandlerStats(MBLogger<RestHandlerStats> pLogger,
+        public RestHandlerCommStats(MBLogger<RestHandlerStats> pLogger,
                                 IOptions<RestManagerConfig> pRestConfig,
                                 RestManager pRestManager,
                                 ECMFactory pECMFactory,
                                 ICommProvider pCommProvider
                                 ) : base(pRestManager,
-                                Utilities.JoinFilePieces(pRestManager.APIBase, "/stats")) {
+                                Utilities.JoinFilePieces(pRestManager.APIBase, "comm/stats")) {
             m_log = pLogger;
             m_restConfig = pRestConfig;
             // m_commConfig = pCommConfig;
@@ -55,12 +55,9 @@ namespace org.herbal3d.mblue.Rest {
                 ["timestamp"] = DateTime.UtcNow.ToString("o"),
                 ["commprovider"] = m_commProvider.GetType().Name,
                 ["isconnected"] = m_commProvider.IsConnected,
-                ["isloggedin"] = m_commProvider.IsLoggedIn
+                ["isloggedin"] = m_commProvider.IsLoggedIn,
+                ["stats"] = m_commProvider.CommStatistics.GetDump() ?? new JsonObject()
             };
-
-            responseMap["components"] = m_ECMFactory.GetDump() ?? new JsonObject();
-            // m_log.Log(MBLogLevel.DRESTDETAIL, "Stats response: " + responseMap.ToString());
-            m_log.Log(MBLogLevel.DRESTDETAIL, "Returning stats");
 
             /* Sample code on how configuration parameters can be added to the response.
             // Add in the comm config parameters

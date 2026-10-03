@@ -11,8 +11,8 @@
 import { LogDebug } from "./DebugLog.js";
 let BASEURL = 'http://localhost:9144';
 const ClickableOps = {};
-// Make all 'class=k-clickable' page items create events
-Array.from(document.getElementsByClassName('k-clickable')).forEach(nn => {
+// Make all 'class=mb-clickable' page items create events
+Array.from(document.getElementsByClassName('mb-clickable')).forEach(nn => {
     nn.addEventListener('click', (evnt) => {
         const buttonOp = evnt.target.getAttribute('op');
         if (buttonOp && typeof (ClickableOps[buttonOp]) === 'function') {
@@ -35,11 +35,11 @@ ClickableOps['refetchGrids'] = function (pTarget) {
 };
 // Button to do the login based on the form entries
 ClickableOps['gridLogin'] = function (pTarget) {
-    var first = document.getElementById('k-gridLogin-first').value;
-    var last = document.getElementById('k-gridLogin-last').value;
-    var password = document.getElementById('k-gridLogin-password').value;
-    var startLoc = document.getElementById('k-gridLogin-startLoc').value;
-    var grid = document.getElementById('k-gridLogin-gridSelect').value;
+    var first = document.getElementById('mb-gridLogin-first').value;
+    var last = document.getElementById('mb-gridLogin-last').value;
+    var password = document.getElementById('mb-gridLogin-password').value;
+    var startLoc = document.getElementById('mb-gridLogin-startLoc').value;
+    var grid = document.getElementById('mb-gridLogin-gridSelect').value;
     LogDebug(`Logging in user ${first} ${last} to grid ${grid} with password`);
     var loginData = {
         FirstName: first,
@@ -103,7 +103,7 @@ ClickableOps['gridExit'] = function (pTarget) {
 };
 // Fetch the list of grids from the viewer and populate the grid select box
 function FetchGridInfo() {
-    fetch(BASEURL + '/api/Session/login', { method: 'GET', cache: 'no-cache' })
+    fetch(BASEURL + '/api/grids', { method: 'GET', cache: 'no-cache' })
         .then(response => {
         if (!response.ok) {
             LogDebug('Fetch grids failed: Network response was not ok');
@@ -112,8 +112,8 @@ function FetchGridInfo() {
         return response.json();
     })
         .then(data => {
-        // LogDebug('Grid data: ' + JSON.stringify(data));
-        var selector = document.getElementById('k-gridLogin-gridSelect');
+        LogDebug('Grid data: ' + JSON.stringify(data));
+        var selector = document.getElementById('mb-gridLogin-gridSelect');
         selector.options.length = 0;
         for (let grid in data.grids) {
             let valu = data.grids[grid];
@@ -130,7 +130,7 @@ function FetchGridInfo() {
 // ============================================================
 function UpdateAllStats() {
     UpdateStats();
-    UpdateCommStats();
+    // UpdateCommStats(); // will be added
     // Add more as needed
 }
 function UpdateStats() {
@@ -143,7 +143,7 @@ function UpdateStats() {
         return response.json();
     })
         .then((data) => {
-        var displayArea = document.getElementById('k-stats');
+        var displayArea = document.getElementById('mb-stats');
         if (displayArea) {
             displayArea.innerHTML = '';
             displayArea.appendChild(FormatStatsData(data));
@@ -155,7 +155,7 @@ function UpdateStats() {
     });
 }
 function UpdateCommStats() {
-    fetch(BASEURL + '/api/LLLP/stats', { method: 'GET', cache: 'no-cache' })
+    fetch(BASEURL + '/api/comm/stats', { method: 'GET', cache: 'no-cache' })
         .then(response => {
         if (!response.ok) {
             LogDebug('Fetch Comm stats failed: Network response was not ok');
@@ -164,7 +164,7 @@ function UpdateCommStats() {
         return response.json();
     })
         .then((data) => {
-        var displayArea = document.getElementById('k-statsComm');
+        var displayArea = document.getElementById('mb-statsComm');
         if (displayArea) {
             displayArea.innerHTML = '';
             displayArea.appendChild(FormatLLLPStatsData(data));
@@ -176,14 +176,14 @@ function UpdateCommStats() {
     });
 }
 function DisplayNoStats() {
-    var displayArea = document.getElementById('k-stats');
+    var displayArea = document.getElementById('mb-stats');
     if (displayArea) {
         displayArea.innerHTML = '';
         displayArea.appendChild(MakeTextElement("No stats"));
     }
 }
 function DisplayNoCommStats() {
-    var displayArea = document.getElementById('k-statsComm');
+    var displayArea = document.getElementById('mb-statsComm');
     if (displayArea) {
         displayArea.innerHTML = '';
         displayArea.appendChild(MakeTextElement("No comm stats"));
@@ -197,9 +197,9 @@ function FormatStatsData(data) {
     tbl.appendChild(MakeStatInfoRow("Is Connected", data.isconnected ? "Yes" : "No"));
     tbl.appendChild(MakeStatInfoRow("Is Logged In", data.isloggedin ? "Yes" : "No"));
     allStats.appendChild(tbl);
-    allStats.appendChild(MakeStatsWorld(data.world));
-    allStats.appendChild(MakeSectionHeader("Work Queues"));
-    allStats.appendChild(MakeStatsWorkQueue(data.workqueues));
+    // allStats.appendChild(MakeStatsWorld(data.world));
+    // allStats.appendChild(MakeSectionHeader("Work Queues"));
+    // allStats.appendChild(MakeStatsWorkQueue(data.workqueues));
     allStats.appendChild(MakeStatsComponents(data.components));
     return allStats;
     // var preArea = MakeElement('pre');

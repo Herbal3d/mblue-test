@@ -69,6 +69,7 @@ namespace org.herbal3d.mblue.Rest {
         private RestHandler? m_staticHandler;
         private RestHandler? m_stdHandler;
         private RestHandler? m_statsHandler;
+        private RestHandler? m_commStatsHandler;
 
         // return the full base URL with the port added
         public readonly string BaseURL;
@@ -104,6 +105,7 @@ namespace org.herbal3d.mblue.Rest {
             m_staticHandler = m_RestHandlerFactory.CreateHandler<RestHandlerStatic>();
             m_stdHandler = m_RestHandlerFactory.CreateHandler<RestHandlerUI>();
             m_statsHandler = m_RestHandlerFactory.CreateHandler<RestHandlerStats>();
+            m_commStatsHandler = m_RestHandlerFactory.CreateHandler<RestHandlerCommStats>();
             // m_faviconHandler = m_RestHandlerFactory.CreateHandler<RestHandlerFavicon>();
 
             try {
@@ -120,7 +122,7 @@ namespace org.herbal3d.mblue.Rest {
                             HttpListenerResponse response = context.Response;
 
                             string absURL = request.Url?.AbsolutePath.ToLower() ?? "";
-                            m_log.Log(MBLogLevel.DRESTDETAIL, "HTTP request for {0}", absURL);
+                            m_log.Log(MBLogLevel.DRESTDETAIL, $"HTTP {request.HttpMethod} request for {absURL}");
 
                             RestHandler? thisHandler = m_handlers.Find((rh) => absURL.StartsWith(rh.Prefix.ToLower()));
 
@@ -139,11 +141,11 @@ namespace org.herbal3d.mblue.Rest {
                                 }
                             } else {
                                 m_statNoHandlers.Event();
-                                m_log.Log(MBLogLevel.Warning, "Request not processed because no matching handler, URL={0}", absURL);
+                                m_log.Log(MBLogLevel.Warning, $"Request not processed because no matching handler, URL={absURL}");
                                 DoErrorResponse(response, HttpStatusCode.NotFound, null);
                             }
                         } catch (Exception e) {
-                            m_log.Log(MBLogLevel.Error, "RestManager listener exception: {0}", e.ToString());
+                            m_log.Log(MBLogLevel.Error, $"RestManager listener exception: {e.ToString()}");
                         }
                     }, cancellationToken).ConfigureAwait(false);
                 }

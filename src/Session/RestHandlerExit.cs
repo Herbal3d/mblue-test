@@ -39,7 +39,7 @@ namespace org.herbal3d.mblue.Session {
                                 ICommProvider pCommProvider,
                                 GlobalControl pGlobalControl
                                 ) : base(pRestManager,
-                                    Utilities.JoinFilePieces(pRestManager.APIBase, "Session/exit")) {
+                                    Utilities.JoinFilePieces(pRestManager.APIBase, "session/exit")) {
             m_log = pLogger;
             m_restConfig = pRestConfig;
             m_commProvider = pCommProvider;
@@ -61,6 +61,7 @@ namespace org.herbal3d.mblue.Session {
                 m_RestManager.DoSimpleResponse(pResponse, null, null);
                 // Also force the main loop to exit, which will cause the app to close.
                 m_cancelToken.Cancel();
+                m_log.Log(MBLogLevel.DREST, "Doing Cancel() on global CancellationTokenSource");
             } catch (Exception e) {
                 m_log.Log(MBLogLevel.DRESTDETAIL, "Exit exception: " + e.ToString());
                 m_RestManager.DoErrorResponse(pResponse, HttpStatusCode.InternalServerError,

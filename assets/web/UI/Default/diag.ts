@@ -17,8 +17,8 @@ let BASEURL='http://localhost:9144'
 type ClickOperation = ( pTarget: EventTarget ) => void;
 const ClickableOps: { [key: string]: ClickOperation } = {};
 
-// Make all 'class=k-clickable' page items create events
-Array.from(document.getElementsByClassName('k-clickable')).forEach( nn => {
+// Make all 'class=mb-clickable' page items create events
+Array.from(document.getElementsByClassName('mb-clickable')).forEach( nn => {
     nn.addEventListener('click', (evnt: Event) => {
         const buttonOp = (evnt.target as HTMLElement).getAttribute('op');
         if (buttonOp && typeof(ClickableOps[buttonOp]) === 'function') {
@@ -42,11 +42,11 @@ ClickableOps['refetchGrids'] = function(pTarget: EventTarget) : void {
 };
 // Button to do the login based on the form entries
 ClickableOps['gridLogin'] = function(pTarget: EventTarget) : void {
-    var first = (document.getElementById('k-gridLogin-first') as HTMLInputElement).value;
-    var last = (document.getElementById('k-gridLogin-last') as HTMLInputElement).value;
-    var password = (document.getElementById('k-gridLogin-password') as HTMLInputElement).value;
-    var startLoc = (document.getElementById('k-gridLogin-startLoc') as HTMLInputElement).value;
-    var grid = (document.getElementById('k-gridLogin-gridSelect') as HTMLSelectElement).value;
+    var first = (document.getElementById('mb-gridLogin-first') as HTMLInputElement).value;
+    var last = (document.getElementById('mb-gridLogin-last') as HTMLInputElement).value;
+    var password = (document.getElementById('mb-gridLogin-password') as HTMLInputElement).value;
+    var startLoc = (document.getElementById('mb-gridLogin-startLoc') as HTMLInputElement).value;
+    var grid = (document.getElementById('mb-gridLogin-gridSelect') as HTMLSelectElement).value;
     
     LogDebug(`Logging in user ${first} ${last} to grid ${grid} with password`);
 
@@ -124,7 +124,7 @@ interface GridsInfo {
 
 // Fetch the list of grids from the viewer and populate the grid select box
 function FetchGridInfo() : void{
-    fetch( BASEURL + '/api/Session/login', { method: 'GET', cache: 'no-cache' } )
+    fetch( BASEURL + '/api/grids', { method: 'GET', cache: 'no-cache' } )
     .then( response => {
         if (!response.ok) {
             LogDebug('Fetch grids failed: Network response was not ok');
@@ -133,8 +133,8 @@ function FetchGridInfo() : void{
         return response.json();
     })
     .then( data => {
-        // LogDebug('Grid data: ' + JSON.stringify(data));
-        var selector = (document.getElementById('k-gridLogin-gridSelect') as HTMLSelectElement);
+        LogDebug('Grid data: ' + JSON.stringify(data));
+        var selector = (document.getElementById('mb-gridLogin-gridSelect') as HTMLSelectElement);
         selector.options.length = 0;
         for (let grid in data.grids) {
             let valu = data.grids[grid];
@@ -152,7 +152,7 @@ function FetchGridInfo() : void{
 // ============================================================
 function UpdateAllStats() : void {
     UpdateStats();
-    UpdateCommStats();
+    // UpdateCommStats(); // will be added
     // Add more as needed
 }
 
@@ -166,7 +166,7 @@ function UpdateStats() : void {
         return response.json();
     })
     .then( (data: StatsData) => {
-        var displayArea = document.getElementById('k-stats');
+        var displayArea = document.getElementById('mb-stats');
         if (displayArea) {
             displayArea.innerHTML = '';
             displayArea.appendChild(FormatStatsData(data));
@@ -178,7 +178,7 @@ function UpdateStats() : void {
     });
 }
 function UpdateCommStats() : void {
-    fetch( BASEURL + '/api/LLLP/stats', { method: 'GET', cache: 'no-cache' } )
+    fetch( BASEURL + '/api/comm/stats', { method: 'GET', cache: 'no-cache' } )
     .then( response => {
         if (!response.ok) {
             LogDebug('Fetch Comm stats failed: Network response was not ok');
@@ -187,7 +187,7 @@ function UpdateCommStats() : void {
         return response.json();
     })
     .then( (data: LLLPStatsData) => {
-        var displayArea = document.getElementById('k-statsComm');
+        var displayArea = document.getElementById('mb-statsComm');
         if (displayArea) {
             displayArea.innerHTML = '';
             displayArea.appendChild(FormatLLLPStatsData(data));
@@ -199,14 +199,14 @@ function UpdateCommStats() : void {
     });
 }
 function DisplayNoStats() : void {
-    var displayArea = document.getElementById('k-stats');
+    var displayArea = document.getElementById('mb-stats');
     if (displayArea) {
         displayArea.innerHTML = '';
         displayArea.appendChild(MakeTextElement("No stats"));
     }
 }
 function DisplayNoCommStats() : void {
-    var displayArea = document.getElementById('k-statsComm');
+    var displayArea = document.getElementById('mb-statsComm');
     if (displayArea) {
         displayArea.innerHTML = '';
         displayArea.appendChild(MakeTextElement("No comm stats"));
@@ -220,9 +220,9 @@ function FormatStatsData(data: StatsData) : HTMLElement {
     tbl.appendChild(MakeStatInfoRow("Is Connected", data.isconnected ? "Yes" : "No"));
     tbl.appendChild(MakeStatInfoRow("Is Logged In", data.isloggedin ? "Yes" : "No"));
     allStats.appendChild(tbl);
-    allStats.appendChild(MakeStatsWorld(data.world));
-    allStats.appendChild(MakeSectionHeader("Work Queues"));
-    allStats.appendChild(MakeStatsWorkQueue(data.workqueues));
+    // allStats.appendChild(MakeStatsWorld(data.world));
+    // allStats.appendChild(MakeSectionHeader("Work Queues"));
+    // allStats.appendChild(MakeStatsWorkQueue(data.workqueues));
     allStats.appendChild(MakeStatsComponents(data.components));
     return allStats;
     // var preArea = MakeElement('pre');

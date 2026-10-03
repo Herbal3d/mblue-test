@@ -33,7 +33,7 @@ namespace org.herbal3d.mblue.Session {
                                 RestManager pRestManager,
                                 Grids pGrids
                                 ) : base(pRestManager,
-                                    Utilities.JoinFilePieces(pRestManager.APIBase, "Session/grids")) {
+                                    Utilities.JoinFilePieces(pRestManager.APIBase, "grids")) {
             m_log = pLogger;
             m_grids = pGrids;
         }
@@ -55,6 +55,7 @@ namespace org.herbal3d.mblue.Session {
                     gridArray.Add(gridMap);
                 });
                 respMap.Add("grids", gridArray);
+                // m_log.Log(MBLogLevel.Debug, "RestHandlerGrids: Responding with grids: {0}", respMap.ToString());
 
                 byte[] respBytes = Encoding.UTF8.GetBytes(respMap.ToString());
                 m_RestManager.DoSimpleResponse(pResponse, "application/json", () => respBytes);

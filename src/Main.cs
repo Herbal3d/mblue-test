@@ -24,6 +24,7 @@ using org.herbal3d.mblue.Common;
 using org.herbal3d.mblue.ecm;
 using org.herbal3d.mblue.Logging;
 using org.herbal3d.mblue.Rest;
+using org.herbal3d.mblue.Session;
 
 namespace org.herbal3d.mblue {
 
@@ -83,7 +84,11 @@ namespace org.herbal3d.mblue {
                      // This reads MBlue.{Environment}.json, which can be used to override settings
                      //       for specific environments (e.g. Development, Staging, Production).
                      config.AddJsonFile($"MBlue.{context.HostingEnvironment.EnvironmentName}.json", optional: true, reloadOnChange: true);
-                     // config.AddJsonFile("Grids.json", optional: false, reloadOnChange: true);
+
+                     // Read the grids configuration from Grids.json for OpenSim grids.
+                     // This should really be in the mblue-comm-os module but not sure how to add.
+                     config.AddJsonFile("Grids.json", optional: false, reloadOnChange: true);
+
                      config.AddEnvironmentVariables("MBlue_");
                      // re-add command line args so they override other settings
                      config.AddCommandLine(Environment.GetCommandLineArgs());
@@ -97,26 +102,29 @@ namespace org.herbal3d.mblue {
                      // for more details on NLog configuration using appsettings.json.
                  })
                  .ConfigureServices((context, services) => {
-                     services.Configure<MBlueConfig>(context.Configuration.GetSection(MBlueConfig.subSectionName));
+                     services.Configure<MBlueConfig>(context.Configuration.GetSection(MBlueConfig.subSectionName))
 
-                     // The global cancellation token source that can be used to signal shutdown across the app.
-                     services.AddSingleton<GlobalControl>();
+                        // The global cancellation token source that can be used to signal shutdown across the app.
+                        .AddSingleton<GlobalControl>()
 
-                     // Version information for the application and MBlue.Common assembly.
-                     services.AddSingleton<MBVersions>();
+                        // Version information for the application and MBlue.Common assembly.
+                        .AddSingleton<MBVersions>()
 
-                     // Logger and MBLogger wrapper for base logger
-                     services.Configure<MBLoggerConfig>(context.Configuration.GetSection(MBLoggerConfig.subSectionName));
-                     services.AddTransient(typeof(MBLogger<>));
+                        // Logger and MBLogger wrapper for base logger
+                        .Configure<MBLoggerConfig>(context.Configuration.GetSection(MBLoggerConfig.subSectionName))
+                        .AddTransient(typeof(MBLogger<>))
 
-                     // The test routine has a REST interface for interaction
-                     services.AddTransient<RestHandlerDumpable>();
-                     services.AddTransient<RestHandlerStatic>();
-                     services.AddTransient<RestHandlerStats>();
-                     services.AddTransient<RestHandlerUI>();
-                     services.AddSingleton<RestHandlerFactory>();
-                     services.AddSingleton<RestManager>();
-                     services.AddHostedService(sp => sp.GetRequiredService<RestManager>());
+                        // The test routine has a REST interface for interaction
+                        .AddTransient<RestHandlerDumpable>()
+                        .AddTransient<RestHandlerStatic>()
+                        .AddTransient<RestHandlerStats>()
+                        .AddTransient<RestHandlerUI>()
+                        .AddSingleton<RestHandlerFactory>()
+                        .AddSingleton<RestManager>()
+                        .AddHostedService(sp => sp.GetRequiredService<RestManager>())
+                        .AddSingleton<SessionManager>()
+                        .AddHostedService(sp => sp.GetRequiredService<SessionManager>());
+
 
                      // Add MBlue ECM services
                      MBlueECMServiceSetup.AddServices(services, context.Configuration);
@@ -125,40 +133,18 @@ namespace org.herbal3d.mblue {
                      // This also adds the actual underlying communication services.
                      MBlueCommServiceSetup.AddServices(services, context.Configuration);
 
+                     // For the moment, just stuff the comm-os services into the DI container.
+                     // This should eventually be moved into the mblue-comm service setup.
+                     MBlueCommOSServiceSetup.AddServices(services, context.Configuration);
+
                      // TODO: add more
 
                  })
                  .Build();
 
             m_log = MBlueTestMain.GetService<MBLogger<MBlueTestMain>>();
-            IOptions<MBlueConfig> mblueConfig = GetMBlueConfig;
 
-            MBVersions mbVersion = MBlueTestMain.GetService<MBVersions>();
-            mbVersion.AppName = mblueConfig.Value.AppName;
-            mbVersion.AppVersion = ThisAssembly.AssemblyInformationalVersion;
-
-            m_log.LogInformation($"{mbVersion.AppName} Version: {mbVersion.AppVersion}");
-
-            // Get the version of MBlue.Common from its assembly attribute
-            string mblue_common_version = typeof(MBException).Assembly
-                .GetCustomAttribute<System.Reflection.AssemblyInformationalVersionAttribute>()
-                ?.InformationalVersion ?? "unknown";
-            m_log.LogInformation("MBlue.Common Version: {version}", mblue_common_version);
-            mbVersion.AddOtherVersion("MBlue.Common", mblue_common_version);
-
-            // Get the version of MBlue.ECM from its assembly attribute
-            string mblue_ecm_version = typeof(MBlueECMServiceSetup).Assembly
-                .GetCustomAttribute<System.Reflection.AssemblyInformationalVersionAttribute>()
-                ?.InformationalVersion ?? "unknown";
-            m_log.LogInformation("MBlue.ECM Version: {version}", mblue_ecm_version);
-            mbVersion.AddOtherVersion("MBlue.ECM", mblue_ecm_version);
-
-            // Get the version of MBlue.comm from its assembly attribute
-            string mblue_comm_version = typeof(MBlueCommServiceSetup).Assembly
-                .GetCustomAttribute<System.Reflection.AssemblyInformationalVersionAttribute>()
-                ?.InformationalVersion ?? "unknown";
-            m_log.LogInformation("MBlue.comm Version: {version}", mblue_comm_version);
-            mbVersion.AddOtherVersion("MBlue.comm", mblue_comm_version);
+            CollectAndDisplayVersions(m_log);
 
             LogConfigurationComplete(m_log);
 
@@ -174,6 +160,44 @@ namespace org.herbal3d.mblue {
         static partial void LogConfigurationComplete(ILogger logger);
         [LoggerMessage(0, LogLevel.Information, "MBlue application shutting down.")]
         static partial void LogShutdown(ILogger logger);
+
+        // Collects and displays the versions of the application and its modules.
+        // Fills the MBVersions object with the application and module versions.
+        private static void CollectAndDisplayVersions(MBLogger<MBlueTestMain> m_log) {
+            IOptions<MBlueConfig> mblueConfig = GetMBlueConfig;
+            MBVersions mbVersion = MBlueTestMain.GetService<MBVersions>();
+
+            mbVersion.AppName = mblueConfig.Value.AppName;
+            mbVersion.AppVersion = ThisAssembly.AssemblyInformationalVersion;
+            mbVersion.AddOtherVersion("MBlue.Test", ThisAssembly.AssemblyInformationalVersion);
+
+            // Get the version of MBlue.Common from its assembly attribute
+            string mblue_common_version = typeof(MBException).Assembly
+                .GetCustomAttribute<System.Reflection.AssemblyInformationalVersionAttribute>()
+                ?.InformationalVersion ?? "unknown";
+            mbVersion.AddOtherVersion("MBlue.Common", mblue_common_version);
+
+            // Get the version of MBlue.ECM from its assembly attribute
+            string mblue_ecm_version = typeof(MBlueECMServiceSetup).Assembly
+                .GetCustomAttribute<System.Reflection.AssemblyInformationalVersionAttribute>()
+                ?.InformationalVersion ?? "unknown";
+            mbVersion.AddOtherVersion("MBlue.ECM", mblue_ecm_version);
+
+            // Get the version of MBlue.comm from its assembly attribute
+            string mblue_comm_version = typeof(MBlueCommServiceSetup).Assembly
+                .GetCustomAttribute<System.Reflection.AssemblyInformationalVersionAttribute>()
+                ?.InformationalVersion ?? "unknown";
+            mbVersion.AddOtherVersion("MBlue.comm", mblue_comm_version);
+
+            // Get the version of MBlue.comm-os from its assembly attribute
+            string mblue_comm_os_version = typeof(MBlueCommOSServiceSetup).Assembly
+                .GetCustomAttribute<System.Reflection.AssemblyInformationalVersionAttribute>()
+                ?.InformationalVersion ?? "unknown";
+            mbVersion.AddOtherVersion("MBlue.comm-os", mblue_comm_os_version);
+
+            m_log.LogInformation($"MBlue application {mbVersion.AppName} version {mbVersion.AppVersion}");
+            mbVersion.OtherVersions.ToList().ForEach(v => m_log.LogInformation($"Module {v.Key} version {v.Value}"));
+        }
 
     }
 }

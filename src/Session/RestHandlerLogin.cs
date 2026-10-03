@@ -37,7 +37,7 @@ namespace org.herbal3d.mblue.Session {
                                 SessionManager pSessionManager,
                                 ICommProvider pCommProvider
                                 ) : base(pRestManager,
-                                    Utilities.JoinFilePieces(pRestManager.APIBase, "Session/login")) {
+                                    Utilities.JoinFilePieces(pRestManager.APIBase, "session/login")) {
             m_log = pLogger;
             m_restConfig = pRestConfig;
             m_commProvider = pCommProvider;

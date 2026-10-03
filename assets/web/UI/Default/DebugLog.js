@@ -11,7 +11,7 @@
 // Log debug message to the DEBUGG div if it exists
 // If classname is specified, add that class to the new div
 export function LogDebug(msg, classname) {
-    const debugg = document.getElementById("k-DEBUGG");
+    const debugg = document.getElementById("mb-DEBUGG");
     if (debugg != undefined) {
         const newline = document.createElement("div");
         newline.appendChild(document.createTextNode(msg));
