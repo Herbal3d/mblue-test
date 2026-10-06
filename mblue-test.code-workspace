@@ -1,8 +1,10 @@
 {
   "folders": [
-    {
-      "path": ".",
-    },
+    { "name": "Test", "path": "." },
+    { "name": "Common", "path": "../mblue-common" },
+    { "name": "ECM", "path": "../mblue-ecm" }
+    { "name": "Comm", "path": "../mblue-comm" },
+    { "name": "Comm-OS", "path": "../mblue-comm-os" },
   ],
   "settings": {
     "files.associations": {
